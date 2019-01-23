@@ -21,8 +21,6 @@ used the eject looking button to load up music files.
 
 open kadenze classifier in musicControl.
 
-open SimpleVideoInputWithProcessing_10000Inputs
-
-applications for windows and linux exist, mac ones need to be made from source
+open SimpleVideoInputWithProcessing_1600Inputs
 
 run classifier.
