@@ -21,17 +21,22 @@ boolean locked = false;
 int resHor = 640;
 int resVert = 480;
 
+float meanC = 0;
+int totPix = resHor*resVert;
+
 int numHoriz = resHor/boxWidth;
 int numVert = resVert/boxHeight;
 
 float bx;
 float by;
 float byDefault = resVert/2.0-sliderDim/2;
+float byMin = 0;
+float byMax = resVert-sliderDim;
 float bxLock = 640;
 
 float yOffset = 0.0;
-
-
+int firstRun = 1;
+float threshold;
 
 color[] downPix = new color[numHoriz * numVert];
 
@@ -99,14 +104,17 @@ void draw() {
     } */
   int boxNum = 0;
   int tot = boxWidth*boxHeight;
-  float meanC = 0;
-  int totPix = resHor*resVert;
-  for (int i = 0; i<totPix; i++){
-    meanC += red(video.pixels[i])+green(video.pixels[i])+blue(video.pixels[i]);
-    
+  if (firstRun ==1){
+
+    for (int i = 0; i<totPix; i++){
+      meanC += red(video.pixels[i])+green(video.pixels[i])+blue(video.pixels[i]);
+      
+    }
+    meanC = threshMult*meanC/totPix;
+    threshold = meanC;
+    //by = (255/threshold)*(resVert/2.0)-sliderDim/2;
+    firstRun = 0;
   }
-  meanC = threshMult*meanC/totPix;
-  
   for (int x = 0; x < resHor; x += boxWidth) {
      for (int y = 0; y < resVert; y += boxHeight) {
         float red = 0, green = 0, blue = 0;
@@ -121,7 +129,7 @@ void draw() {
         }
        //downPix[boxNum] =  color(red/tot, green/tot, blue/tot);
        float gray = sqrt(pow((red/tot),2)+ pow((green/tot),2)+ pow((blue/tot),2));
-       if (gray>meanC){
+       if (gray>threshold){
          downPix[boxNum] =  color(255);  
        } else{
          downPix[boxNum] =  color(0);  
@@ -200,7 +208,13 @@ void mouseDragged() {
   if(locked) {
     bx = bxLock; 
     by = mouseY-yOffset; 
-    threshMult = by/byDefault;
+    if(by>byMax){
+      by = byMax;
+    }else if(by<byMin){
+      by = byMin;
+    }
+    //threshMult = by/byDefault;
+    threshold = meanC*by/byDefault;
   }
 }
 
