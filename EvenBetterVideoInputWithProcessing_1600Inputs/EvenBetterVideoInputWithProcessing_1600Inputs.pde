@@ -14,12 +14,24 @@ boolean first = true;
 float threshMult = 1;
 int boxWidth = 16;
 int boxHeight = 12;
+int sliderDim = 100;
+boolean overBox = false;
+boolean locked = false;
 
 int resHor = 640;
 int resVert = 480;
 
 int numHoriz = resHor/boxWidth;
 int numVert = resVert/boxHeight;
+
+float bx;
+float by;
+float byDefault = resVert/2.0-sliderDim/2;
+float bxLock = 640;
+
+float yOffset = 0.0;
+
+
 
 color[] downPix = new color[numHoriz * numVert];
 
@@ -32,8 +44,9 @@ NetAddress dest2;
 
 void setup() {
  // colorMode(HSB);
-  size(640, 480, P2D);
-
+  size(740, 480, P2D);
+  bx = bxLock;
+  by = byDefault;
   String[] cameras = Capture.list();
 
   if (cameras == null) {
@@ -66,6 +79,9 @@ void setup() {
 }
 
 void draw() {
+  background(255);
+  fill(255);
+
   
   if (video.available() == true) {
     video.read();
@@ -133,7 +149,20 @@ void draw() {
   first = false;
   fill(0);
   text("Sending 100 inputs to port 6448 using message /wek/inputs", 10, 10);
-
+  
+  
+  if (mouseX > bx-sliderDim && mouseX < bx+sliderDim && 
+      mouseY > by-sliderDim && mouseY < by+sliderDim) {
+    overBox = true;  
+    if(!locked) { 
+      fill(0, 255, 0);
+    } 
+  } else {
+    fill(0, 255, 0);
+    overBox = false;
+  }
+  fill(0, 255, 0);
+  rect(bx, by, sliderDim, sliderDim);
 }
 
 float diff(int p, int off) {
@@ -152,4 +181,29 @@ void sendOsc(int[] px) {
    }
   oscP5.send(msg, dest);
   oscP5.send(msg, dest2);
+}
+
+
+void mousePressed() {
+  if(overBox) { 
+    locked = true; 
+    fill(0, 255, 0);
+  } else {
+    locked = false;
+  }
+
+  yOffset = mouseY-by; 
+
+}
+
+void mouseDragged() {
+  if(locked) {
+    bx = bxLock; 
+    by = mouseY-yOffset; 
+    threshMult = by/byDefault;
+  }
+}
+
+void mouseReleased() {
+  locked = false;
 }
