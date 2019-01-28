@@ -17,6 +17,10 @@ var counter1 = 0;
 var counter2 = 0;
 var counter3 = 0;
 var counter4 = 0;
+var counter5 = 0;
+var volControl = 0;
+var volCount = 0;
+var volTot = 0
 
 
 /*
@@ -35,31 +39,35 @@ clientN.connect(50000, '127.0.0.1', function() {
 */
 var oscServer = new osc.Server(12000, '0.0.0.0');
 oscServer.on("/wek/outputs", function (msg, rinfo) {
-      console.log("OSC message:");
-      console.log(msg[1]);
+      //console.log("OSC message:");
+      //console.log(msg[1]);
 	  selector = msg[1]
-	  
+	  //console.log('count')
 	  if (selector === 1){
 		counter1 = counter1+1
-		console.log('count')
-		console.log(counter1)
+		
+		//console.log(counter1)
 		if (counter1 >10){
-			counter1 = -10;
+			counter1 = -20;
 			counter2 = 0;
 			counter3 = 0;
 			counter4 = 0;
+			counter5 = 0;
+			volControl = 0;
 
 		}
 		
 	  }
 	  if (selector === 2){
 		counter2 = counter2+1
-		console.log(counter2)
+		//console.log(counter2)
 		if (counter2 >10){
 			counter1 = 0;
-			counter2 = -10;
+			counter2 = -20;
 			counter3 = 0;
 			counter4 = 0;
+			counter5 = 0;
+			volControl = 0;
 			var options = {
 				url: 'http://127.0.0.1:8080/requests/status.xml?command=pl_previous',
 				auth: {
@@ -76,12 +84,15 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
 	  }
 	  if (selector === 3){
 		counter3 = counter3+1
-		console.log(counter3)
+		//console.log(counter3)
 		if (counter3 >10){
 			counter1 = 0;
 			counter2 = 0;
-			counter3 = -10;
+			counter3 = -20;
 			counter4 = 0;
+			counter5 = 0;
+			volControl = 0;
+			
 			var options = {
 				url: 'http://127.0.0.1:8080/requests/status.xml?command=pl_next',
 				auth: {
@@ -98,12 +109,14 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
 	  }
 	  if (selector === 4){
 		counter4 = counter4+1
-		console.log(counter4)
+		//console.log(counter4)
 		if (counter4 >10){
 			counter1 = 0;
 			counter2 = 0;
 			counter3 = 0;
-			counter4 = -10;
+			counter4 = -20;
+			counter5 = 0;
+			volControl = 0;
 			var options = {
 				url: 'http://127.0.0.1:8080/requests/status.xml?command=pl_pause',
 				auth: {
@@ -116,6 +129,19 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
 			  //console.log(body.url);
 			  //console.log(body.explanation);
 			});
+		}
+	  }
+	  if (selector === 5){
+		counter5 = counter5+1
+		//console.log(counter5)
+		if (counter5 >10){
+			counter1 = 0;
+			counter2 = 0;
+			counter3 = 0;
+			counter4 = 0;
+			counter5 = 0;
+			volControl = 1;
+		
 		}
 	  }	  
 	  /*
@@ -133,8 +159,34 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
 		});
 */
 });
-
-
+oscServer.on("/wek/outputs2", function (msg, rinfo) {
+	//console.log(volControl);
+	if (volControl ==1){
+		console.log("OSC message:");
+		console.log(msg[1]);
+		var urlBase = 'http://127.0.0.1:8080/requests/status.xml?command=volume&val=';
+		volTot = volTot+msg[1];
+		volCount = volCount +1;
+		if (volCount == 5){
+			var volume = volTot*100;
+			volTot=0;
+			volCount=0;
+			var options = {
+				
+				url: urlBase+volume,
+				auth: {
+					user: username,
+					password: password
+				}
+			}		
+			request(options, (err, res, body) => {
+			  if (err) { return console.log(err); }
+			  //console.log(body.url);
+			  //console.log(body.explanation);
+			});
+		}
+	}
+});
 //app.listen('8081')
 
 //console.log('Magic happens on port 8081');
