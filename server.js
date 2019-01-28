@@ -43,6 +43,10 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
       //console.log(msg[1]);
 	  selector = msg[1]
 	  //console.log('count')
+	  if (counter1+counter2+counter3+counter4 > -190){
+		  volControl = 0;
+	  }
+	  
 	  if (selector === 1){
 		counter1 = counter1+1
 		
@@ -135,11 +139,11 @@ oscServer.on("/wek/outputs", function (msg, rinfo) {
 		counter5 = counter5+1
 		//console.log(counter5)
 		if (counter5 >10){
-			counter1 = 0;
-			counter2 = 0;
-			counter3 = 0;
-			counter4 = 0;
-			counter5 = 0;
+			counter1 = -50;
+			counter2 = -50;
+			counter3 = -50;
+			counter4 = -50;
+			counter5 = -50;
 			volControl = 1;
 		
 		}
