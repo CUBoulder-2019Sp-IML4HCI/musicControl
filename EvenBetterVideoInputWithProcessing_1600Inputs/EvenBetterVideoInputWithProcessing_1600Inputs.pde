@@ -38,8 +38,14 @@ float yOffset = 0.0;
 int firstRun = 1;
 float threshold;
 
-color[] downPix = new color[numHoriz * numVert];
+float custR=255;
+float custG=255;
+float custB=255;
+float cThresh = 10;
+float cThreshD = 20;
 
+color[] downPix = new color[numHoriz * numVert];
+color[] prevPic = new color[resHor * resVert];
 
 Capture video;
 
@@ -48,6 +54,7 @@ NetAddress dest;
 NetAddress dest2;
 
 void setup() {
+  
  // colorMode(HSB);
   size(740, 480, P2D);
   bx = bxLock;
@@ -84,14 +91,15 @@ void setup() {
 }
 
 void draw() {
-  background(255);
-  fill(255);
+  background(255-custR,255-custG,255-custB);
+  //fill(255);
 
   
   if (video.available() == true) {
     video.read();
     
     video.loadPixels(); // Make the pixels of video available
+    prevPic= video.pixels;
     /*for (int i = 0; i < numPixels; i++) {
       int x = i % video.width;
       int y = i / video.width;
@@ -112,6 +120,8 @@ void draw() {
     }
     meanC = threshMult*meanC/totPix;
     threshold = meanC;
+    cThreshD = meanC/2;
+    cThresh = meanC/2;
     //by = (255/threshold)*(resVert/2.0)-sliderDim/2;
     firstRun = 0;
   }
@@ -127,21 +137,23 @@ void draw() {
               blue += blue(video.pixels[index]);
            } 
         }
+        //print(red,"\n");
        //downPix[boxNum] =  color(red/tot, green/tot, blue/tot);
-       float gray = sqrt(pow((red/tot),2)+ pow((green/tot),2)+ pow((blue/tot),2));
-       if (gray>threshold){
-         downPix[boxNum] =  color(255);  
-       } else{
-         downPix[boxNum] =  color(0);  
-       }
+       //float gray = sqrt(pow((red/tot),2)+ pow((green/tot),2)+ pow((blue/tot),2));
+       //if (gray>threshold){
+       //  downPix[boxNum] =  color(255);  
+       //} else{
+       //  downPix[boxNum] =  color(0);  
+       //}
        //downPix[boxNum] =  color( sqrt(pow((red/tot),2)+ pow((green/tot),2)+ pow((blue/tot),2)) );
       // downPix[boxNum] = color((float)red/tot, (float)green/tot, (float)blue/tot);
+       downPix[boxNum] =  color(custThresh(red/tot,green/tot,blue/tot));
        fill(downPix[boxNum]);
        
-       int index = x + resHor*y;
-       red += red(video.pixels[index]);
-       green += green(video.pixels[index]);
-       blue += blue(video.pixels[index]);
+       //int index = x + resHor*y;
+       //red += red(video.pixels[index]);
+       //green += green(video.pixels[index]);
+       //blue += blue(video.pixels[index]);
       // fill (color(red, green, blue));
        rect(x, y, boxWidth, boxHeight);
        boxNum++;
@@ -169,8 +181,10 @@ void draw() {
     fill(0, 255, 0);
     overBox = false;
   }
-  fill(0, 255, 0);
+  fill(custR, custG, custB);
+
   rect(bx, by, sliderDim, sliderDim);
+
 }
 
 float diff(int p, int off) {
@@ -200,7 +214,14 @@ void mousePressed() {
     locked = false;
   }
 
-  yOffset = mouseY-by; 
+  yOffset = mouseY-by;
+  if (mouseX <resHor){
+    int index = (mouseX) + (mouseY) * resHor;
+    custR = red(prevPic[index]);
+    custG = green(prevPic[index]);
+    custB = blue(prevPic[index]);
+    print(custR,"\n");
+  }
 
 }
 
@@ -214,10 +235,20 @@ void mouseDragged() {
       by = byMin;
     }
     //threshMult = by/byDefault;
-    threshold = meanC*by/byDefault;
+    cThresh = cThreshD*pow(by/byDefault,2);
   }
 }
 
 void mouseReleased() {
   locked = false;
+}
+
+int custThresh(float r, float g, float b){
+  //print(r,"\n");
+  //print((sqrt(pow(r-custR,2)+pow(g-custG,2)+pow(b-custB,2)))+"\n");
+  if (sqrt(pow(r-custR,2)+pow(g-custG,2)+pow(b-custB,2)) < cThresh){
+    return 255; 
+  } else {
+    return 0;
+  }
 }
