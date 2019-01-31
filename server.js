@@ -37,6 +37,7 @@ clientN.connect(50000, '127.0.0.1', function() {
 	clientN.write('Help');
 });
 */
+
 var oscServer = new osc.Server(12000, '0.0.0.0');
 oscServer.on("/wek/outputs", function (msg, rinfo) {
       //console.log("OSC message:");
@@ -172,7 +173,7 @@ oscServer.on("/wek/outputs2", function (msg, rinfo) {
 		volTot = volTot+msg[1];
 		volCount = volCount +1;
 		if (volCount == 5){
-			var volume = volTot*100;
+			var volume = volTot*120;
 			volTot=0;
 			volCount=0;
 			var options = {

@@ -24,6 +24,7 @@ Capture video;
 
 OscP5 oscP5;
 NetAddress dest;
+NetAddress dest2;
 
 void setup() {
  // colorMode(HSB);
@@ -56,6 +57,7 @@ void setup() {
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this,9000);
   dest = new NetAddress("127.0.0.1",6448);
+  dest2 = new NetAddress("127.0.0.1",6449);
   
 }
 
@@ -130,4 +132,5 @@ void sendOsc(int[] px) {
       msg.add(float(px[i])); 
    }
   oscP5.send(msg, dest);
+  oscP5.send(msg, dest2);
 }
