@@ -30,9 +30,10 @@ run from the source
 
 open kadenze
 
-you will need to open two models. Open gestureControl and volumeControl. 
+you will need to open two models. Open gestureControl and volumeControl. They should have the below settings, you just need to retrain
 gestureControl should have default port settings
 volumeControl should listen on port 6449 and output messages to port 12000 with message /wek/outputs2
+
 
 For gestureControl, gestures are as follows:
 1: nothing. User is sitting still
@@ -43,6 +44,8 @@ For gestureControl, gestures are as follows:
 
 For volume control, train it with your left hand as a plane at various heights, with a value corresponding to the height. 1 should be the highest and 0 the lowest.
 
-Volume control will only change volume with gestureControl is outputting 5.
+Volume control will only change volume when gestureControl is outputting 5.
+
+https://www.youtube.com/watch?v=Z0YdeS9oSXw
 
 
